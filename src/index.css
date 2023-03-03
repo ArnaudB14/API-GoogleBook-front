@@ -1,0 +1,136 @@
+@font-face {
+  font-family: "Parisienne-Regular";
+  src: local("Parisienne"),
+    url("./fonts/Parisienne-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat-regular";
+  src: local("Montserrat"),
+    url("./fonts/montserrat/Montserrat-Regular.ttf") format("truetype");
+}
+
+
+html{
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+  
+  font-family: "Montserrat-regular" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+}
+
+code {
+  font-family: "Montserrat-regular" !important;
+}
+
+.App-header h1 {
+  font-family: "Parisienne-Regular";
+}
+
+ul li {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none !important;
+  color: black !important;
+}
+
+.active {
+  position: relative;
+  font-size: 2em;
+}
+
+.active:before {
+  content: "";
+  background: black;
+  transition-duration: 0.3s;
+  position: absolute;
+  bottom: 0px;
+  width: 50% !important;
+  height: 2px;
+}
+
+.nav-link {
+  position: relative;
+  font-size: 2em;
+}
+
+.nav-link:before {
+  content: "";
+  background: black;
+  transition-duration: 0.3s;
+  position: absolute;
+  bottom: 0px;
+  width: 0;
+  height: 2px;
+}
+
+.nav-link:hover:before {
+  background: black;
+  width: 50%;
+}
+
+.card {
+  margin-right: 20px;
+  margin-top: 20px;
+  width: calc(25% - 20px);
+}
+
+.book-description {
+  display: block;
+  height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-subtitle {
+  display: block;
+  height: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-author {
+  margin-bottom: 120px !important;
+}
+
+.voir-suite {
+  bottom: 5px;
+  right: 15px;
+  text-decoration: underline !important;
+  color: #0B5ED7 !important;
+}
+
+#livres{
+  width: 200px;
+}
+
+.deconnexion {
+  cursor: pointer;
+}
+
+.login-form, .inscription-form {
+  width: 40%;
+}
+
+
+.login-form .form-group > div, .inscription-form .form-group > div{
+  color: red;
+}
+
+.add-list {
+  position: absolute;
+  bottom: 15px;
+  right: 10%;
+  width: 80%;
+}
+
+.book-description {
+  margin-bottom: 60px;
+}
