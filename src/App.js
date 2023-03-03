@@ -42,9 +42,6 @@ const App = () => {
     }, "2000")
   
   }
-
-
-  // console.log(JSON.parse(window.localStorage.user).values.email);
   
   return (
     <div className="App">
@@ -52,18 +49,11 @@ const App = () => {
         <div className='mx-5 py-5'>
         <Routes>
           <Route path="/" element={<Home user={user} />}/>
-          {user ? (
-            <>
-              <Route element={<ProtectedRoute user={user} />}>
-                <Route path="/account" element={<Account user={user} setUser={setUser} />} />
-              </Route>
-            </>
-          ) : (
-            <>
-              <Route path="/login" element={<Login login={handleLogin} />}/>
-              <Route path="/inscription" element={<Inscription redirect={handleInscription}/>}/>
-            </>
-          )}
+          <Route element={<ProtectedRoute user={user} />}>
+            <Route path="/account" element={<Account user={user} setUser={setUser} />} />
+          </Route>
+          <Route path="/login" element={<Login login={handleLogin} />}/>
+          <Route path="/inscription" element={<Inscription redirect={handleInscription}/>}/>
         </Routes>
 
         </div>
