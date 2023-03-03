@@ -29,9 +29,10 @@ const Inscription = ({redirect}) => {
   const onSubmit = (values, { resetForm }) => {
     const storedData = localStorage.getItem('userInscrit');
     const emailValue = document.querySelector('.emailInscription').value;
-    var vals=[];
+
+    var emails=[];
     for(var item of storedData){
-       vals.push(item.email);
+      emails.push(item.email);
     }
     if(storedData.includes(emailValue)) {
       toast.error("Cette adresse email est déjà utilisée");
