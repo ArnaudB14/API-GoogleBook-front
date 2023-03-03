@@ -24,7 +24,7 @@ const App = () => {
 
   const handleLogin = values => {
     setUser({values});
-    navigate('/account');
+    navigate('/');
     console.log(values)
   }
   
@@ -35,6 +35,14 @@ const App = () => {
     setUser(null);
     navigate('/login');
   }
+
+  const handleInscription = () => {
+    setTimeout(() => {
+      navigate('/login');
+    }, "2000")
+  
+  }
+
 
   // console.log(JSON.parse(window.localStorage.user).values.email);
   
@@ -53,7 +61,7 @@ const App = () => {
           ) : (
             <>
               <Route path="/login" element={<Login login={handleLogin} />}/>
-              <Route path="/inscription" element={<Inscription />}/>
+              <Route path="/inscription" element={<Inscription redirect={handleInscription}/>}/>
             </>
           )}
         </Routes>

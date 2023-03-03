@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 
-const SignupForm = () => {
+const Inscription = ({redirect}) => {
   const initialValues = {
     username: '',
     email: '',
@@ -19,7 +19,7 @@ const SignupForm = () => {
       .email('Email invalide')
       .required('L\'email est obligatoire'),
     password: Yup.string()
-      .min(6, 'Ton mot de passe doit faire au moins 6 caractères')
+      .min(6, 'Ton mot de passe doit faire au moins 6caractères')
       .required('Le mot de passe est obligatoire'),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref('password'), null], 'Les mots de passe ne correspondent pas')
@@ -28,11 +28,25 @@ const SignupForm = () => {
 
   const onSubmit = (values, { resetForm }) => {
     const storedData = localStorage.getItem('userInscrit');
-    const existingData = storedData ? JSON.parse(storedData) : [];
-    existingData.push(values);
-    localStorage.setItem('userInscrit', JSON.stringify(existingData));
-    resetForm();
-    toast.success('Votre inscription est réussie');
+    const emailValue = document.querySelector('.emailInscription').value;
+    var vals=[];
+    for(var item of storedData){
+       vals.push(item.email);
+    }
+    if(storedData.includes(emailValue)) {
+      toast.error("Cette adresse email est déjà utilisée");
+      setTimeout(() => {
+        window.location.reload();
+      }, "2000")
+    } else {
+      const existingData = storedData ? JSON.parse(storedData) : [];
+      existingData.push(values);
+      localStorage.setItem('userInscrit', JSON.stringify(existingData));
+      resetForm();
+      toast.success('Votre inscription est réussie');
+      redirect();
+    }
+
   };
 
   return (
@@ -40,7 +54,7 @@ const SignupForm = () => {
       {({ isSubmitting }) => (
         <Form className='p-3 mx-auto w-fit-content login-form mt-5'>
           <ToastContainer position="top-right"
-            autoClose={1500}
+            autoClose={1000}
             hideProgressBar={false}
             newestOnTop={false}
             closeOnClick
@@ -55,7 +69,7 @@ const SignupForm = () => {
           </div>
           <div className="form-group mt-4">
             <label htmlFor="email">Email</label>
-            <Field type="email" name="email" className="form-control"/>
+            <Field type="email" name="email" className="form-control emailInscription"/>
             <ErrorMessage name="email" component="div" />
           </div>
           <div className="form-group mt-4">
@@ -76,4 +90,4 @@ const SignupForm = () => {
     </Formik>
   );
 };
-export default SignupForm;
+export default Inscription;
