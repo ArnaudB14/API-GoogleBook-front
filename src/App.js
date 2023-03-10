@@ -7,6 +7,7 @@ import Account from './components/Account';
 import Login from './components/Login';
 import Inscription from './components/Inscription';
 import ProtectedRoute from './components/ProtectedRoute';
+import axios from './axios'
 
 import "./fonts/Parisienne-Regular.ttf";
 
@@ -18,9 +19,12 @@ const App = () => {
     return JSON.parse(localStorage.getItem("user")) || null
   });
   
-  useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(user));
-  }, [user]);
+  // useEffect(() => {
+  //   axios.get('/api/user').then((response) => {
+  //     setUser(response);
+  //     console.log(response);
+  //   })
+  // });
 
   const handleLogin = values => {
     setUser({values});

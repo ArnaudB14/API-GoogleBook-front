@@ -2,56 +2,72 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
+import axios from '../axios'
 
 const Inscription = ({redirect}) => {
   const initialValues = {
-    username: '',
+    name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    password_confirmation: ''
   };
 
+  const csrf = () => axios.get('/sanctum/csrf-cookie')
+
+  const register = async (values, { resetForm }) => {
+    await csrf()
+    console.log(values);
+    axios
+        .post('/register', values).then((response) => {
+          toast.success("Inscription réussie");
+          console.log(response);
+        })
+        .catch(error => {
+            if (error.response.status !== 422) throw error
+        })
+  }
+
   const validationSchema = Yup.object().shape({
-    username: Yup.string()
+    name: Yup.string()
       .min(3, 'Ton Username doit faire au moins 3 caractères')
       .required('L\'Username est obligatoire'),
     email: Yup.string()
       .email('Email invalide')
       .required('L\'email est obligatoire'),
     password: Yup.string()
-      .min(6, 'Ton mot de passe doit faire au moins 6caractères')
+      .min(8, 'Ton mot de passe doit faire au moins 8 caractères')
       .required('Le mot de passe est obligatoire'),
-    confirmPassword: Yup.string()
+    password_confirmation: Yup.string()
       .oneOf([Yup.ref('password'), null], 'Les mots de passe ne correspondent pas')
       .required('Le mot de passe est obligatoire')
   });
 
-  const onSubmit = (values, { resetForm }) => {
-    const storedData = localStorage.getItem('userInscrit');
-    const emailValue = document.querySelector('.emailInscription').value;
+  // const onSubmit = (values, { resetForm }) => {
+  //   const storedData = localStorage.getItem('userInscrit');
+  //   const emailValue = document.querySelector('.emailInscription').value;
 
-    var emails=[];
-    for(var item of storedData){
-      emails.push(item.email);
-    }
-    if(storedData.includes(emailValue)) {
-      toast.error("Cette adresse email est déjà utilisée");
-      setTimeout(() => {
-        window.location.reload();
-      }, "2000")
-    } else {
-      const existingData = storedData ? JSON.parse(storedData) : [];
-      existingData.push(values);
-      localStorage.setItem('userInscrit', JSON.stringify(existingData));
-      resetForm();
-      toast.success('Votre inscription est réussie');
-      redirect();
-    }
+  //   var emails=[];
+  //   for(var item of storedData){
+  //     emails.push(item.email);
+  //   }
+  //   if(storedData.includes(emailValue)) {
+  //     toast.error("Cette adresse email est déjà utilisée");
+  //     setTimeout(() => {
+  //       window.location.reload();
+  //     }, "2000")
+  //   } else {
+  //     const existingData = storedData ? JSON.parse(storedData) : [];
+  //     existingData.push(values);
+  //     localStorage.setItem('userInscrit', JSON.stringify(existingData));
+  //     resetForm();
+  //     toast.success('Votre inscription est réussie');
+  //     redirect();
+  //   }
 
-  };
+  // };
 
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
+    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={register}>
       {({ isSubmitting }) => (
         <Form className='p-3 mx-auto w-fit-content login-form mt-5'>
           <ToastContainer position="top-right"
@@ -64,9 +80,9 @@ const Inscription = ({redirect}) => {
             pauseOnHover={false}
           />
           <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <Field type="text" name="username" className="form-control"/>
-            <ErrorMessage name="username" component="div" />
+            <label htmlFor="name">Name</label>
+            <Field type="text" name="name" className="form-control"/>
+            <ErrorMessage name="name" component="div" />
           </div>
           <div className="form-group mt-4">
             <label htmlFor="email">Email</label>
@@ -79,9 +95,9 @@ const Inscription = ({redirect}) => {
             <ErrorMessage name="password" component="div" />
           </div>
           <div className="form-group mt-4">
-            <label htmlFor="confirmPassword">Confirmer votre mot de passe</label>
-            <Field type="password" name="confirmPassword" className="form-control"/>
-            <ErrorMessage name="confirmPassword" component="div" />
+            <label htmlFor="password_confirmation">Confirmer votre mot de passe</label>
+            <Field type="password" name="password_confirmation" className="form-control"/>
+            <ErrorMessage name="password_confirmation" component="div" />
           </div>
           <button type="submit" disabled={isSubmitting}  className="btn btn-primary mt-4">
             S'inscrire
