@@ -2,22 +2,32 @@ import { useState, useEffect } from 'react';
 import AccountInformation from './AccountInformation';
 import AddNoteModal from './Modal/AddNoteModal';
 import ShowNoteModal from './Modal/ShowNoteModal';
+import Axios from '../axios';
+import { toast } from 'react-toastify';
 
 const Account = ({user, setUser}) => {
 const [books, setBooks] = useState([]);
+const [loading, setLoading] = useState(true);
 
 useEffect(() => {
-  const items = JSON.parse(localStorage.getItem('library'));
-  if (items) {
-   setBooks(items);
-  }
+  Axios.get('/collection').then(({data}) => {
+    setBooks(data);
+  }).catch((error) => {
+    console.log(error);
+  }).finally(() => {
+    setLoading(false)
+  }) 
 }, []);
 
-const deleteBooks = (id) => {
-  const items = JSON.parse(localStorage.getItem('library'));
-  let deletedBook = items.filter((book) => book.id !== id)
-  setBooks(deletedBook)
-  localStorage.setItem("library", JSON.stringify(deletedBook));
+const deleteBooks = async (id) => {
+  try {
+    await Axios.delete(`/collection/${id}`);
+    setBooks(books.filter(book => book.collection.id !== id));
+    toast.success("Le livre a bien été supprimé");
+  } catch(error) {
+    toast.error("Impossible de supprimer le livre");
+  }
+
 }
 
 // Gestion des notes
@@ -103,34 +113,34 @@ const deleteNote = (id) => {
   }
 };
 
-
 return (
     <div className='mt-5'>
       <AccountInformation user={user} setUser={setUser} />
       <h2>Ma liste de livres</h2>
+      { !loading ? ( 
         <ul className='d-flex flex-wrap'>
-        {books.length > 0 ? (
+        {books && books.length > 0 ? (
             books.map(book => (
                 <div className="card" key={book.id}>
-                    {book.volumeInfo.imageLinks ? (
-                        <img className="card-img-top" src={book.volumeInfo.imageLinks.thumbnail} alt="Card" />
+                    {book.img ? (
+                        <img className="card-img-top" src={book.img} alt="Card" />
                     ) : (
                         <></>
                     )}
                     <div className="card-body position-relative">
-                        <h5 className="card-title"><strong>{book.volumeInfo.title}</strong></h5>
-                        {book.volumeInfo.subtitle ? (
-                        <h6 className="card-subtitle mb-2 text-muted">{book.volumeInfo.subtitle}</h6>
+                        <h5 className="card-title"><strong>{book.title}</strong></h5>
+                        {book.subtitle ? (
+                        <h6 className="card-subtitle mb-2 text-muted">{book.subtitle}</h6>
                         ) : (
                           <></>
                        )}
-                      {book.volumeInfo.authors ? (
-                    <h6 className="card-subtitle mb-2 text-muted">Par <strong>{book.volumeInfo.authors}</strong></h6>
+                      {book.authors ? (
+                    <h6 className="card-subtitle mb-2 text-muted">Par <strong>{book.authors}</strong></h6>
                     ) : (
                       <></>
                     )}
-                      {book.volumeInfo.description ? (
-                        <p className="card-text mt-4 book-description">{book.volumeInfo.description}</p>
+                      {book.description ? (
+                        <p className="card-text mt-4 book-description">{book.description}</p>
                         ) : (
                           <></>
                       )}
@@ -139,7 +149,7 @@ return (
                         ) : (
                             <button className='btn btn-success me-2 mt-2' onClick={() => {showAddNoteModal(book.id)}}>Ajouter une note</button>
                         )}
-                        <button className='btn btn-danger mt-2' onClick={() => {deleteBooks(book.id)}}>Supprimer de ma liste</button>
+                        <button className='btn btn-danger mt-2' onClick={() => {deleteBooks(book.collection.id)}}>Supprimer de ma liste</button>
                     </div> 
 
                     {addNoteModal.show && (
@@ -161,7 +171,9 @@ return (
             )}
           
         </ul>
-        
+        ) : (
+          <p>Chargement...</p>
+        )}
     </div>
   );
 }

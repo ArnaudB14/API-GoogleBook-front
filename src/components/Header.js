@@ -7,7 +7,7 @@ const Header =({user, logout}) => {
         <nav>
             <ul className="d-flex align-items-center">
                 <li><NavLink to="/" className="nav-link">Accueil</NavLink></li>
-                {user ? (
+                {user && Object.keys(user).length > 0 ? (
                   <>
                     <li className="ms-5"><NavLink to="/account" className="nav-link">Mon compte</NavLink></li>
                     <li className="ms-5 nav-link deconnexion" onClick={() => {logout()}}>Déconnexion</li>

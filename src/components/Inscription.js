@@ -1,10 +1,12 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import axios from '../axios'
+import { useNavigate } from 'react-router-dom';
 
-const Inscription = ({redirect}) => {
+const Inscription = ({redirect, setUser}) => {
+
   const initialValues = {
     name: '',
     email: '',
@@ -12,19 +14,24 @@ const Inscription = ({redirect}) => {
     password_confirmation: ''
   };
 
-  const csrf = () => axios.get('/sanctum/csrf-cookie')
+  const navigate = useNavigate();
 
+  const csrf = () => axios.get('/sanctum/csrf-cookie')
   const register = async (values, { resetForm }) => {
     await csrf()
-    console.log(values);
-    axios
-        .post('/register', values).then((response) => {
-          toast.success("Inscription réussie");
-          console.log(response);
-        })
-        .catch(error => {
-            if (error.response.status !== 422) throw error
-        })
+    try {
+      await axios.post('/register', values)
+      toast.success("Inscription réussie");
+
+      const response = await axios.get('/api/user')
+      setUser(response.data);
+      console.log(response.data);
+      navigate("/");
+
+    } catch(error) {
+      if (error.response.status !== 422) throw error
+      document.querySelector('.error-message-register').innerHTML += error.response.data.message;
+    }
   }
 
   const validationSchema = Yup.object().shape({
@@ -70,15 +77,6 @@ const Inscription = ({redirect}) => {
     <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={register}>
       {({ isSubmitting }) => (
         <Form className='p-3 mx-auto w-fit-content login-form mt-5'>
-          <ToastContainer position="top-right"
-            autoClose={1000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            theme="dark"
-            pauseOnHover={false}
-          />
           <div className="form-group">
             <label htmlFor="name">Name</label>
             <Field type="text" name="name" className="form-control"/>
@@ -99,6 +97,7 @@ const Inscription = ({redirect}) => {
             <Field type="password" name="password_confirmation" className="form-control"/>
             <ErrorMessage name="password_confirmation" component="div" />
           </div>
+          <div className='error-message-register mt-3 text-danger'></div>
           <button type="submit" disabled={isSubmitting}  className="btn btn-primary mt-4">
             S'inscrire
           </button>

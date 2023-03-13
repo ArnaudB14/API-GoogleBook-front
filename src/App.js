@@ -1,5 +1,6 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
 
 import Header from './components/Header';
 import Home from './components/Home';
@@ -14,53 +15,53 @@ import "./fonts/Parisienne-Regular.ttf";
 const App = () => {
 
   const navigate = useNavigate();
+  const [user, setUser] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  const [user, setUser] = useState(() => {
-    return JSON.parse(localStorage.getItem("user")) || null
-  });
-  
-  // useEffect(() => {
-  //   axios.get('/api/user').then((response) => {
-  //     setUser(response);
-  //     console.log(response);
-  //   })
-  // });
+  useEffect(() => {
+    axios.get('/api/user').then((response) => {
+      setUser(response.data);
+    }).catch((error) => {
+      setUser({})
+    }).finally(() => {
+      setLoading(false);
+    })
+  }, [navigate])
 
-  const handleLogin = values => {
-    setUser({values});
-    navigate('/');
-    console.log(values)
-  }
-  
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('library');
-    localStorage.removeItem('search');
-    setUser(null);
+    axios.post('/logout');
+    setUser({});
     navigate('/login');
   }
 
-  const handleInscription = () => {
-    setTimeout(() => {
-      navigate('/login');
-    }, "2000")
-  
-  }
-  
   return (
     <div className="App">
-      <Header user={user} logout={handleLogout} />
+      { !loading ? ( 
+        <>
+      <ToastContainer position="top-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        theme="dark"
+        pauseOnHover={false}
+      />
+        <Header user={user} logout={handleLogout} />
         <div className='mx-5 py-5'>
         <Routes>
           <Route path="/" element={<Home user={user} />}/>
           <Route element={<ProtectedRoute user={user} />}>
             <Route path="/account" element={<Account user={user} setUser={setUser} />} />
           </Route>
-          <Route path="/login" element={<Login login={handleLogin} />}/>
-          <Route path="/inscription" element={<Inscription redirect={handleInscription}/>}/>
+          <Route path="/login" element={<Login setUser={setUser} />}/>
+          <Route path="/inscription" element={<Inscription setUser={setUser} />}/>
         </Routes>
-
         </div>
+        </>
+      ) : (
+        <p>Chargement...</p>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
+import Axios from '../axios';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Home = ({ user }) => {
@@ -10,9 +11,6 @@ const Home = ({ user }) => {
   const [books, setBooks] = useState([]);
   const [search, setSearch] = useState(() => {
     return JSON.parse(localStorage.getItem('search')) || ''
-  });
-  const [library, setLibrary] = useState(() => {
-    return JSON.parse(localStorage.getItem('library')) || []
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,32 +42,20 @@ const Home = ({ user }) => {
   
 
   const addToList = book => {
-
-    const doubleId = [];
-
-    library.forEach(function (item) {
-      doubleId.push(item.id);
+    Axios.post('/book', {
+      googlebook_id: book.id,
+      title: book.volumeInfo.title,
+      author: JSON.stringify(book.volumeInfo.authors),
+      description: book.volumeInfo.description,
+      img: book.volumeInfo?.imageLinks?.thumbnail
+    })
+    .then(function (response) {
+      toast.success("Le livre a bien été ajouté à votre liste");
+    })
+    .catch(function (error) {
+      toast.error("Le livre est déjà dans votre collection");
     });
-    if (user) {
-      if (library.length > 0) {
-        if (doubleId.includes(book.id)) {
-          toast.error("Le livre est déjà dans votre liste");
-        } else {
-          toast.success("Le livre a bien été ajouté à votre liste");
-          setLibrary([...library, book]);
-        }
-      } else {
-        toast.success("Le livre a bien été ajouté à votre liste");
-        setLibrary([...library, book])
-      }
-    }
-    else {
-      toast.error("Vous devez être connecté pour ajouter un livre à votre liste");
-    }
   }
-  useEffect(() => {
-    localStorage.setItem('library', JSON.stringify(library));
-  }, [library]);
 
   useEffect(() => {
     localStorage.setItem('search', JSON.stringify(search));
@@ -87,15 +73,6 @@ const Home = ({ user }) => {
   }
   return (
     <div>
-      <ToastContainer position="top-right"
-        autoClose={1500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        theme="dark"
-        pauseOnHover={false}
-      />
       <h2>Recherchez un livre</h2>
       <form onSubmit={(event) => {event.preventDefault()}} className="mx-auto d-flex align-items-center justify-content-center">
         <input type="text" className="form-control w-25 my-5" placeholder="Search..." id="searchBook" name="searchBook" onChange={handleSearchChange}/>

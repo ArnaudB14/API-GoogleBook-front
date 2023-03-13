@@ -1,48 +1,51 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { ToastContainer, toast } from 'react-toastify';
-const Login = props => {
+import { toast } from 'react-toastify';
+import axios from '../axios'
+import { useNavigate } from 'react-router-dom';
+
+const Login = ({setUser}) => {
+
   const initialValues = {
     username: '',
     email: '',
     password: ''
   };
+
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email('Email incorrect')
       .required('L\'adresse email est obligatoire'),
     password: Yup.string()
-      .min(6, 'Ton mot de passe doit faire au moins 6 caractères')
+      .min(8, 'Ton mot de passe doit faire au moins 8 caractères')
       .required('Le mot de passe est obligatoire')
   });
-  const onSubmit = (values) => {
-    const storedData = localStorage.getItem('userInscrit');
-    if (storedData) {
-      const existingData = JSON.parse(storedData);
-      const userExists = existingData.some((user) => user.email === values.email && user.password === values.password);
-      if (userExists) {
-        props.login(values);
-      } else {
-        toast.error('Email ou Mot de passe incorrect');
-      }
-    } else {
-      toast.error('Aucun utilisateur enregistré');
+
+  const navigate = useNavigate();
+  const csrf = () => axios.get('/sanctum/csrf-cookie')
+
+  const login = async (values) => {
+    await csrf()
+    try {
+      await axios.post('/login', values)
+      toast.success("Connexion réussie");
+
+      const response = await axios.get('/api/user')
+      setUser(response.data);
+      console.log(response.data);
+      navigate("/");
+
+    } catch(error) {
+      if (error.response.status !== 422) throw error
+      document.querySelector('.error-message-login').innerHTML += error.response.data.message;
     }
-  };
+  } 
+
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
+    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={login}>
       {({ isSubmitting }) => (
                 <Form className='p-3 mx-auto w-fit-content login-form mt-5'>
-                <ToastContainer position="top-right"
-                    autoClose={1500}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    theme="dark"
-                    pauseOnHover={false}
-                />
                 <div className="form-group ">
                   <label htmlFor="email">Email</label>
                   <Field type="email" name="email" className="form-control"/>
@@ -53,6 +56,7 @@ const Login = props => {
                   <Field type="password" name="password" className="form-control"/>
                   <ErrorMessage name="password" component="div" />
                 </div>
+                <div className='error-message-login mt-3 text-danger'></div>
                 <button type="submit" className="btn btn-primary mt-4">
                   Se connecter
                 </button>
