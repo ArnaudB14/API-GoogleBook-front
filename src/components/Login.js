@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import axios from '../axios'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = ({setUser}) => {
 
@@ -33,7 +33,6 @@ const Login = ({setUser}) => {
 
       const response = await axios.get('/api/user')
       setUser(response.data);
-      console.log(response.data);
       navigate("/");
 
     } catch(error) {
@@ -43,26 +42,29 @@ const Login = ({setUser}) => {
   } 
 
   return (
+    <>
     <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={login}>
       {({ isSubmitting }) => (
-                <Form className='p-3 mx-auto w-fit-content login-form mt-5'>
-                <div className="form-group ">
-                  <label htmlFor="email">Email</label>
-                  <Field type="email" name="email" className="form-control"/>
-                  <ErrorMessage name="email" component="div" />
-                </div>
-                <div className="form-group mt-4">
-                  <label htmlFor="password">Mot de passe</label>
-                  <Field type="password" name="password" className="form-control"/>
-                  <ErrorMessage name="password" component="div" />
-                </div>
-                <div className='error-message-login mt-3 text-danger'></div>
-                <button type="submit" className="btn btn-primary mt-4">
-                  Se connecter
-                </button>
-              </Form>
-            )}
-          </Formik>
-        );
-      };
-    export default Login;
+          <Form className='p-3 mx-auto w-fit-content login-form mt-5'>
+          <div className="form-group ">
+            <label htmlFor="email">Email</label>
+            <Field type="email" name="email" className="form-control"/>
+            <ErrorMessage name="email" component="div" />
+          </div>
+          <div className="form-group mt-4">
+            <label htmlFor="password">Mot de passe</label>
+            <Field type="password" name="password" className="form-control"/>
+            <ErrorMessage name="password" component="div" />
+          </div>
+          <Link to="/change-password" className="link-info mt-4">Mot de passe oublié ?</Link>
+          <div className='error-message-login mt-3 text-danger'></div>
+          <button type="submit" className="btn btn-primary mt-4">
+            Se connecter
+          </button>
+        </Form>
+      )}
+    </Formik>
+    </>
+  );
+};
+export default Login;

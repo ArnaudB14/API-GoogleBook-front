@@ -8,6 +8,7 @@ import Account from './components/Account';
 import Login from './components/Login';
 import Inscription from './components/Inscription';
 import ProtectedRoute from './components/ProtectedRoute';
+import ChangePassword from './components/ChangePassword';
 import axios from './axios'
 
 import "./fonts/Parisienne-Regular.ttf";
@@ -56,11 +57,16 @@ const App = () => {
           </Route>
           <Route path="/login" element={<Login setUser={setUser} />}/>
           <Route path="/inscription" element={<Inscription setUser={setUser} />}/>
+          <Route path='/change-password' element={<ChangePassword />}/>
         </Routes>
         </div>
         </>
       ) : (
-        <p>Chargement...</p>
+        <div className="d-flex justify-content-center mt-5 flex-column">
+          <div className="spinner-border" role="status">
+          </div>
+          <p>Chargement...</p>
+        </div>
       )}
     </div>
   );
