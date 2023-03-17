@@ -11,12 +11,12 @@ const CommentModal = ({saveComment, modalTitle, hideModal, setCommentText, comme
                             </button>
                         </div>
                         <div className="modal-body">
-                            <p>{commentModalText}</p>
+                            <textarea className="form-control updateComment" rows="5" defaultValue={commentModalText} onChange={(e) => {setCommentText(e.target.value)}}></textarea>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={hideModal}>Fermer</button>
-                            <button className='btn btn-danger mt-2' onClick={() => {updateComment(commentModal.bookId)}}>Modifier la note</button>
-                            <button className='btn btn-danger mt-2' onClick={() => {deleteComment(commentModal.bookId)}}>Supprimer la note</button>
+                            <button className='btn btn-primary' onClick={() => {updateComment(commentModal.bookId)}}>Modifier le commentaire</button>
+                            <button className='btn btn-danger' onClick={() => {deleteComment(commentModal.bookId)}}>Supprimer le commentaire</button>
     
                         </div>
                     </div>

@@ -134,3 +134,13 @@ a {
 .book-description {
   margin-bottom: 60px;
 }
+
+.star {
+  color: grey;
+  cursor: pointer;
+  font-size:25px;
+}
+
+.star.filled {
+  color: yellow;
+}
